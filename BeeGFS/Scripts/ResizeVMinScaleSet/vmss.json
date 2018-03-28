@@ -1,0 +1,8 @@
+{
+ "sku": {
+   "name": "Standard_DS3_v2",
+   "tier": "Standard",
+   "capacity": 1
+ },
+ "location": "southcentralus"
+ }

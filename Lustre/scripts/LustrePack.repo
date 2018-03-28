@@ -1,0 +1,17 @@
+[lustreserver]
+name=lustreserver
+baseurl=https://downloads.hpdd.intel.com/public/lustre/lustre-2.9.0/el7/server/
+enabled=1
+gpgcheck=0
+
+[e2fs]
+name=e2fs
+baseurl=https://downloads.hpdd.intel.com/public/e2fsprogs/latest/el7/
+enabled=1
+gpgcheck=0
+
+[lustreclient]
+name=lustreclient
+baseurl=https://downloads.hpdd.intel.com/public/lustre/lustre-2.9.0/el7/client/
+enabled=1
+gpgcheck=0

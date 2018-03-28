@@ -1,0 +1,387 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachineNamePrefix": {
+      "type": "String"
+    },
+    "nodeCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of storage nodes"
+      },
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 100
+    },
+    "virtualMachineSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS14_v2",
+      "allowedValues": [
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS11",
+        "Standard_DS12",
+        "Standard_DS13",
+        "Standard_DS14",
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2",
+        "Standard_F1s",
+        "Standard_F2s",
+        "Standard_F4s",
+        "Standard_F8s",
+        "Standard_F16s",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS5",
+        "Standard_L4s",
+        "Standard_L8s",
+        "Standard_L16s",
+        "Standard_L32s"
+      ],
+      "metadata": {
+        "description": "sku to use for the storage nodes - only premium disks VMs are allowed"
+      }
+    },
+    "adminUsername": {
+      "type": "String"
+    },
+    "adminPublicKey": {
+      "type": "String"
+    },
+    "storageDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the storage services"
+      }
+    },
+    "storageDiskCount": {
+      "type": "int",
+      "defaultValue": 10,
+      "minValue": 0,
+      "maxValue": 63,
+      "metadata": {
+        "description": "Number of storage disks"
+      }
+    },
+    "RGvnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the RG of the virtual network which MGS VM is using."
+      }
+    },
+    "mgsNodeName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of MGS VM"
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "adminUserName": "[parameters('adminUserName')]",
+    "templatelink": "[uri(deployment().properties.templateLink.uri, 'scripts')]",
+    "lustreInstall": "[concat('bash install_lustre.sh ', 'meta ', variables('templatelink'))]",
+    "virtualNetworkName": "lustre-vnet",
+    "vnetRG": "[parameters('RGvnetName')]",
+    "networkInterfaceName": "[concat(parameters('virtualMachineNamePrefix'), 'nic')]",
+    "networkSecurityGroupName": "lustre-nsg",
+    "subnetName": "lustre-subnet",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetPrefix": "10.0.0.0/24",
+    "publicIPAddressName": "[concat(parameters('virtualMachineNamePrefix'), 'pip')]",
+    "publicIPAddressType": "Dynamic",
+    "subnetRef": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('vnetRG'), '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]",
+    "currentDataDiskSize": "P30",
+    "PremiumStorageMap": {
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1023
+      }
+    },
+    "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
+    "storageDiskArray": [
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "0",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "1",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "2",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "3",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "4",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "5",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "6",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "7",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "8",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "9",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "10",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "11",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "12",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "13",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "14",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "15",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "16",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "17",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "18",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "19",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('storageDiskSize')]",
+        "lun": "20",
+        "createOption": "Empty"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('networkSecurityGroupName')]",
+      "apiVersion": "2016-09-01",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-ssh",
+            "properties": {
+              "priority": 1000,
+              "sourceAddressPrefix": "*",
+              "protocol": "TCP",
+              "destinationPortRange": "22",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIpAddresses",
+      "name": "[concat(variables('publicIpAddressName'), copyindex())]",
+      "apiVersion": "2016-09-01",
+      "location": "[variables('location')]",
+      "copy": {
+        "name": "piploop",
+        "count": "[parameters('nodeCount')]"
+      },
+      "properties": {
+        "publicIpAllocationMethod": "[variables('publicIpAddressType')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(variables('networkInterfaceName'), 'oss', copyindex())]",
+      "apiVersion": "2016-09-01",
+      "location": "[variables('location')]",
+      "copy": {
+        "name": "nicLoop",
+        "count": "[parameters('nodeCount')]"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              },
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIpAddress": {
+                "id": "[resourceId(resourceGroup().name,'Microsoft.Network/publicIpAddresses', concat(variables('publicIpAddressName'), copyindex()))]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'), copyindex())]",
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('virtualMachineNamePrefix'), 'oss', copyIndex())]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'), 'oss', copyIndex())]"
+      ],
+      "copy": {
+        "name": "ossVmCopy",
+        "count": "[parameters('nodeCount')]"
+      },
+      "properties": {
+        "osProfile": {
+          "computerName": "[concat(parameters('virtualMachineNamePrefix'), 'oss', copyIndex())]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('virtualMachineSize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "OpenLogic",
+            "offer": "CentOS",
+            "sku": "7.3",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS"
+            }
+          },
+          "dataDisks": "[concat(take(variables('storageDiskArray'), parameters('storageDiskCount')))]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceName'), 'oss', copyIndex()))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('virtualMachineNamePrefix'), 'oss', copyIndex(), '/installlustre')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('virtualMachineNamePrefix'), 'oss', copyIndex())]"
+      ],
+      "copy": {
+        "name": "ossExtensionsCopy",
+        "count": "[parameters('nodeCount')]"
+      },
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[uri(deployment().properties.templateLink.uri, 'scripts/install_lustre_storage.sh')]"
+          ],
+          "commandToExecute": "[concat('bash install_lustre_storage.sh ',parameters('mgsNodeName'),' ',copyIndex(),' ',variables('templatelink'))]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

@@ -1,0 +1,463 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmssName": {
+      "type": "string"
+    },
+    "vmsscount": {
+      "type": "int"
+    },
+    "vmcount": {
+      "type": "int"
+    },
+    "beeGFSNodeSettings": {
+      "type": "object"
+    },
+    "nodeOSSettings": {
+      "type": "object"
+    }
+  },
+  "variables": {
+    "networkApiVersion": "2016-06-01",
+    "insightsApiVersion": "2015-04-01",
+    "computeApiVersion": "2016-04-30-preview",
+    "location": "[resourceGroup().location]",
+    "beeGFSNodeSettings": "[parameters('beeGFSNodeSettings')]",
+    "nodeOSSettings": "[parameters('nodeOSSettings')]",
+    "sshKeyPath": "[concat('/home/',variables('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
+    "virtualNetworkName": "[variables('beeGFSNodeSettings').vnetName]",
+    "subnetName": "[variables('beeGFSNodeSettings').subnetName]",
+    "nicName": "[concat(parameters('vmssName'), 'nic')]",
+    "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
+    "installParams": "[concat(variables('beeGFSNodeSettings').MasterName,' ', variables('beeGFSNodeSettings').nodeType,' ', variables('beeGFSNodeSettings').RAIDLevel)]",
+    "metadataDiskArray": [
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "0",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "1",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "2",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "3",
+        "createOption": "Empty"
+      }
+    ],
+    "storageDiskArray": [
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 0)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 1)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 2)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 3)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 4)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 5)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 6)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 7)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 8)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 9)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 10)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 11)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 12)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 13)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 14)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 15)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 16)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 17)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 18)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 19)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 20)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 21)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 22)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 23)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 24)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 25)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 26)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 27)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 28)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 29)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 30)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 31)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 32)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 33)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 34)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 35)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 36)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 37)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 38)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 39)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 40)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 41)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 42)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 43)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 44)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 45)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 46)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 47)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 48)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 49)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 50)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 51)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 52)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 53)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 54)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 55)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 56)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 57)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 58)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 59)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 60)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 61)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 62)]",
+        "createOption": "Empty"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "name": "[concat(parameters('vmssName'),copyIndex())]",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "[variables('beeGFSNodeSettings').VMsku]",
+        "tier": "Standard",
+        "capacity": "[parameters('vmcount')]"
+      },
+      "copy": {
+        "name": "[parameters('vmssName')]",
+        "count": "[parameters('vmsscount')]"
+      },
+      "properties": {
+        "overprovision": "false",
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "storageProfile": {
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Premium_LRS"
+              }
+            },
+            "imageReference": "[variables('nodeOSSettings').imageReference]",
+            "dataDisks": "[concat(take(variables('storageDiskArray'),variables('beeGFSNodeSettings').numStorageDisks), take(variables('metadataDiskArray'), variables('beeGFSNodeSettings').numMetadataDisks))]"
+          },
+          "osProfile": {
+            "computerNamePrefix": "[parameters('vmssName')]",
+            "adminUsername": "[variables('nodeOSSettings').adminUserName]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": "true",
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[variables('sshKeyPath')]",
+                    "keyData": "[variables('nodeOSSettings').sshKeyData]"
+                  }
+                ]
+              }
+            }
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "[variables('nicName')]",
+                "properties": {
+                  "primary": "true",
+                  "ipConfigurations": [
+                    {
+                      "name": "[variables('ipConfigName')]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "[concat('lapextension',copyIndex())]",
+                "properties": {
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "fileUris": [
+                      "[uri(deployment().properties.templateLink.uri, 'beegfsscripts/install_beegfs_storage.sh')]"
+                    ],
+                    "commandToExecute": "[concat('bash install_beegfs_storage.sh ', variables('installParams'))]"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

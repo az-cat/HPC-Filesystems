@@ -1,0 +1,835 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmssName": {
+      "type": "string",
+      "metadata": {
+        "description": "OSS/MDS VMSS name."
+      },
+      "maxLength": 15
+    },
+    "nodeType": {
+      "type": "string",
+      "defaultValue": "all",
+      "allowedValues": [
+        "all",
+        "both",
+        "storage",
+        "meta",
+        "client"
+      ],
+      "metadata": {
+        "description": "type of beegfs node to deploy"
+      }
+    },
+    "nodeCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of BeeGFS nodes (100 or less)."
+      },
+      "defaultValue": 1,
+      "minValue": 1,
+      "maxValue": 100
+    },
+    "VMSize": {
+      "type": "string",
+      "defaultValue": "Standard_DS3_v2",
+      "allowedValues": [
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS11",
+        "Standard_DS12",
+        "Standard_DS13",
+        "Standard_DS14",
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2",
+        "Standard_F1s",
+        "Standard_F2s",
+        "Standard_F4s",
+        "Standard_F8s",
+        "Standard_F16s",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS5",
+        "Standard_L4s",
+        "Standard_L8s",
+        "Standard_L16s",
+        "Standard_L32s"
+      ],
+      "metadata": {
+        "description": "sku to use for the storage nodes - only premium disks VMs are allowed"
+      }
+    },
+    "VMImage": {
+      "type": "string",
+      "defaultValue": "CentOS_7.2",
+      "allowedValues": [
+        "CentOS_7.2"
+      ],
+      "metadata": {
+        "description": "VM Image."
+      }
+    },        
+    "new/existingVnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "existing vnet name."
+      }
+    },
+    "new/existingSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "existing subnet name"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username on all VMs."
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    },
+    "storageDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the storage services"
+      }
+    },
+    "StorageDisksCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 0,
+      "maxValue": 63,
+      "metadata": {
+        "description": "Number of storage disks"
+      }
+    },
+    "metaDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the metadata services"
+      }
+    },
+    "MetaDisksCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 0,
+      "maxValue": 4,
+      "metadata": {
+        "description": "Number of metadate disks"
+      }
+    },
+    "volumeType": {
+      "type": "string",
+      "defaultValue": "RAID0",
+      "allowedValues": [
+        "RAID0",
+        "RAID5"
+      ],
+      "metadata": {
+        "description": "Volume for data disks."
+      }
+    },
+    "RGvnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the RG of the virtual network which master server is using."
+      }
+    },
+    "masterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of master VM name"
+      }
+    }
+  },
+  "variables": {
+    "networkApiVersion": "2016-06-01",
+    "insightsApiVersion": "2015-04-01",
+    "deploymentApiVersion": "2016-09-01",
+    "computeApiVersion": "2016-04-30-preview",
+    "nicName": "[concat(parameters('vmssName'), 'nic')]",
+    "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
+    "location": "[resourceGroup().location]",
+    "PremiumStorageMap": {
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1023
+      }
+    },
+    "RAIDMap": {
+      "RAID0": {
+        "value": 0
+      },
+      "RAID5": {
+        "value": 5
+      }
+    },
+    "image": "[parameters('VMImage')]",
+    "beeGFSNodeSettings": {
+      "vnetRG": "[parameters('RGvnetName')]",
+      "vnetName": "[parameters('new/existingVnetName')]",
+      "subnetName": "[parameters('new/existingSubnetName')]",
+      "MasterName": "[parameters('masterName')]",
+      "nodeType": "[parameters('nodeType')]",
+      "customDomain": "mydom",
+      "VMsku": "[parameters('VMSize')]",
+      "RAIDLevel": "[variables('RAIDMap')[parameters('volumeType')].value]",
+      "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
+      "numStorageDisks": "[parameters('storageDisksCount')]",
+      "metadataDiskSize": "[variables('PremiumStorageMap')[parameters('metaDiskSize')].size]",
+      "numMetadataDisks": "[parameters('MetaDisksCount')]"
+    },
+    "computeNodeImages": {
+      "CentOS_7.2": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.2",
+        "version": "latest"
+      },
+      "RHEL_7.2": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "7.2",
+        "version": "latest"
+      }
+    },
+    "nodeOSSettings": {
+      "adminUserName": "[parameters('adminUserName')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeNodeImages')[variables('image')]]"
+    },
+    "vnetID": "[resourceId(variables('beeGFSNodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', variables('beeGFSNodeSettings').vnetName)]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/', variables('beeGFSNodeSettings').subnetName)]",
+    "sshKeyPath": "[concat('/home/',variables('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
+    "metadataDiskArray": [
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "0",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "1",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "2",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "3",
+        "createOption": "Empty"
+      }
+    ],
+    "storageDiskArray": [
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 0)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 1)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 2)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 3)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 4)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 5)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 6)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 7)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 8)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 9)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 10)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 11)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 12)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 13)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 14)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 15)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 16)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 17)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 18)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 19)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 20)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 21)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 22)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 23)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 24)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 25)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 26)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 27)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 28)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 29)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 30)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 31)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 32)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 33)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 34)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 35)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 36)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 37)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 38)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 39)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 40)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 41)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 42)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 43)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 44)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 45)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 46)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 47)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 48)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 49)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 50)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 51)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 52)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 53)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 54)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 55)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 56)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 57)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 58)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 59)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 60)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 61)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 62)]",
+        "createOption": "Empty"
+      }
+    ],
+    "installParams": "[concat(variables('beeGFSNodeSettings').MasterName,' ', variables('beeGFSNodeSettings').nodeType,' ', variables('beeGFSNodeSettings').RAIDLevel)]",
+    "vmcount": 5,
+    "subres": "[sub(parameters('nodeCount'), 1)]",
+    "divresult": "[div(variables('subres'),variables('vmcount'))]",
+    "vmsscount": "[add(variables('divresult'),0)]",
+    "beegfstemplatelink": "[uri(deployment().properties.templateLink.uri, 'beegfs-storage.json')]",
+    "VMSSTemplateURIChoice": {
+      "vmss_0": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'beegfs-none.json')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_1": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_2": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_3": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_4": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_5": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_6": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_7": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_8": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_9": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_10": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_11": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_12": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_13": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_14": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_15": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_16": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_17": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_18": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      },
+      "vmss_19": {
+        "uri": "[variables('beegfstemplatelink')]",
+        "contentVersion": "1.0.0.0"
+      }
+    },
+    "modValue": {
+      "mod_0": "[variables('vmcount')]",
+      "mod_1": 1,
+      "mod_2": 2,
+      "mod_3": 3,
+      "mod_4": 4
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "name": "[concat(parameters('vmssName'),'last')]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "sku": {
+        "name": "[variables('beeGFSNodeSettings').VMsku]",
+        "tier": "Standard",
+        "capacity": "[variables('modValue')[concat('mod_',mod(parameters('nodeCount'), variables('vmcount')))]]"
+      },
+      "properties": {
+        "overprovision": "false",
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "[variables('nicName')]",
+                "properties": {
+                  "primary": "true",
+                  "ipConfigurations": [
+                    {
+                      "name": "[variables('ipConfigName')]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('beeGFSNodeSettings').vnetRG, '/providers/Microsoft.Network/virtualNetworks/', variables('beeGFSNodeSettings').vnetName, '/subnets/', variables('beeGFSNodeSettings').subnetName)]"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "storageProfile": {
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Premium_LRS"
+              }
+            },
+            "imageReference": "[variables('nodeOSSettings').imageReference]",
+            "dataDisks": "[concat(take(variables('storageDiskArray'),variables('beeGFSNodeSettings').numStorageDisks), take(variables('metadataDiskArray'), variables('beeGFSNodeSettings').numMetadataDisks))]"
+          },
+          "osProfile": {
+            "computerNamePrefix": "[concat(parameters('vmssName'),'last')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": "true",
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[variables('sshKeyPath')]",
+                    "keyData": "[variables('nodeOSSettings').sshKeyData]"
+                  }
+                ]
+              }
+            }
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "lapextensionlast",
+                "properties": {
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "fileUris": [
+                      "[uri(deployment().properties.templateLink.uri, 'beegfsscripts/install_beegfs_storage.sh')]",
+                      "[uri(deployment().properties.templateLink.uri, 'beegfsscripts/install_ha.sh')]"
+                    ],
+                    "commandToExecute": "[concat('bash install_beegfs_storage.sh ', variables('installParams'))]"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/autoscaleSettings",
+      "apiVersion": "[variables('insightsApiVersion')]",
+      "name": "[concat(parameters('vmSSName'),'autoscalehostlast')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'),'last')]"
+      ],
+      "properties": {
+        "name": "[concat(parameters('vmSSName'),'autoscalehostlast')]",
+        "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'),'last')]",
+        "enabled": true,
+        "profiles": [
+          {
+            "name": "Profile2",
+            "capacity": {
+              "minimum": "1",
+              "maximum": "100",
+              "default": "1"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'),'last')]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 60.0
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT1M"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "beegfs-storage",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('VMSSTemplateURIChoice')[concat('vmss_',int(variables('vmsscount')))].uri]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmssName": {
+            "value": "[parameters('vmssName')]"
+          },
+          "vmsscount": {
+            "value": "[int(variables('vmsscount'))]"
+          },
+          "vmcount": {
+            "value": "[int(variables('vmcount'))]"
+          },
+          "beeGFSNodeSettings": {
+            "value": "[variables('beeGFSNodeSettings')]"
+          },
+          "nodeOSSettings": {
+            "value": "[variables('nodeOSSettings')]"
+          }
+        }
+      }
+    }
+  ]
+}
