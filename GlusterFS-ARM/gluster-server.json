@@ -14,7 +14,7 @@
       "metadata": {
         "description": "Number of gluster nodes (100 or less)."
       },
-      "defaultValue": 1,
+      "defaultValue": 4,
       "minValue": 1,
       "maxValue": 100
 
