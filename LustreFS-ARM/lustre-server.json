@@ -145,7 +145,7 @@
     },
     "StorageDisksCount": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 10,
       "minValue": 0,
       "maxValue": 63,
       "metadata": {

@@ -47,7 +47,7 @@ You have to provide these parameters to the template :
 
 
 
-[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2Fazmi-solliance%2FGlusterFS-ARM%2Fgluster-server.json) 
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-server.json) 
 
 ## Deploy Glustre Client
 
@@ -67,7 +67,7 @@ You have to provide these parameters to the template :
 * _Admin Username_ : This is the name of the administrator account to create on the VM.
 * _SSH Key Data_ : The public SSH key to associate with the administrator user. Format has to be on a single line 'ssh-rsa key'
 
-[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/http%3A%2F%2Fvsts-downloader.azurewebsites.net%2Fdownload.aspx%2F%3FfilePath%3DGlusterFS-ARM%2Fgluster-client.json)
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-client.json)
 
 
 ## Testing 
