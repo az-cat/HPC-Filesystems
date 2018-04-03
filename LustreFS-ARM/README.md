@@ -10,7 +10,7 @@ Table of Contents
   * [Deploy Lustre Client](#Deploy-Lustre-Client)
 
  
-# Lustre
+# Lustre 2.9.0
 Lustre is currently the most widely used parallel file system in HPC solutions. Lustre file systems can scale to tens of thousands of client nodes, tens of petabytes of storage. Lustre file system performed well for large file system, you can refer the testing results for the same.
 
 
