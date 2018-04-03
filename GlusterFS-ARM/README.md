@@ -76,19 +76,19 @@ You have to provide these parameters to the template :
  
  Gluster Client template installed IOR tools for testing, as we have setup nfs for hpcuser and provided required permissions.
   * _Server Nodes testing_ : Login to the VMs run the command "df -h" you get the volume of 9T is you given 10 disks.
-  
-	  [adminuser@gfsmaster000000 ~]$ df -h
-	Filesystem                     Size  Used Avail Use% Mounted on
-	/dev/sda2                       30G  1.8G   28G   7% /
-	devtmpfs                       6.9G     0  6.9G   0% /dev
-	tmpfs                          6.9G     0  6.9G   0% /dev/shm
-	tmpfs                          6.9G  8.5M  6.9G   1% /run
-	tmpfs                          6.9G     0  6.9G   0% /sys/fs/cgroup
-	/dev/sda1                      497M   87M  411M  18% /boot
-	/dev/sdb1                       28G   45M   26G   1% /mnt/resource
-	tmpfs                          1.4G     0  1.4G   0% /run/user/0
-	/dev/mapper/rhgs--data-brick1  9.0T   34M  9.0T   1% /rhs/brick1
-	tmpfs                          1.4G     0  1.4G   0% /run/user/1000
+     
+	     [adminuser@gfsser000000 ~]$ df -h
+		Filesystem                     Size  Used Avail Use% Mounted on
+		/dev/sda2                       30G  1.6G   28G   6% /
+		devtmpfs                       6.9G     0  6.9G   0% /dev
+		tmpfs                          6.9G     0  6.9G   0% /dev/shm
+		tmpfs                          6.9G  8.4M  6.9G   1% /run
+		tmpfs                          6.9G     0  6.9G   0% /sys/fs/cgroup
+		/dev/sda1                      497M   87M  411M  18% /boot
+		/dev/sdb1                       28G   45M   26G   1% /mnt/resource
+		/dev/mapper/rhgs--data-brick1  9.0T   34M  9.0T   1% /rhs/brick1
+		tmpfs                          1.4G     0  1.4G   0% /run/user/1000
+
 
   * _Server Master Node testing_ : Login to the VMs run the command "df -h" you get the volume of 9T if you given 10 disks, and run command "gluster volume info" and will get presented volume if server is not setup currectally it will show "No Volume Present".
 
