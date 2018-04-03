@@ -27,8 +27,8 @@ Note-
 3. If want to create new vnet and subnet create new resource group and If using existing resource group make sure vnet and subnet name does not exist in the resource group.
 4. To manage fault tolrance, high availability is implemented using Distributed-Replicated volume.
 5. To setup Gluster server there are two VMSS is required which would be deployed using the template.
-  *  Without postfix "master", consist (n-1) no. of instances, for example if provided node count is 10 it consist 9.
-  *  With postfix "master", consist 1 node, here all the instances is peer and volume is created.
+   a. Without postfix "master", consist (n-1) no. of instances, for example if provided node count is 10 it consist 9.
+   b. With postfix "master", consist 1 node, here all the instances is peer and volume is created.
 
 You have to provide these parameters to the template :
 * _Location_ : Select the location. 
