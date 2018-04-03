@@ -91,6 +91,27 @@ You have to provide these parameters to the template :
 
 
   * _Server Master Node testing_ : Login to the VMs run the command "df -h" you get the volume of 9T if you given 10 disks, and run command "gluster volume info" and will get presented volume if server is not setup currectally it will show "No Volume Present".
+  
+		  [root@gfsmaster000000 ~]# gluster volume info
+
+		Volume Name: dist-vol
+		Type: Distributed-Replicate
+		Volume ID: 2dde31ee-ba67-42c4-9a40-333d6387bb9e
+		Status: Started
+		Snapshot Count: 0
+		Number of Bricks: 2 x 2 = 4
+		Transport-type: tcp
+		Bricks:
+		Brick1: gfsmaster000000:/rhs/brick1/dist-vol
+		Brick2: gfs000000:/rhs/brick1/dist-vol
+		Brick3: gfs000001:/rhs/brick1/dist-vol
+		Brick4: gfs000002:/rhs/brick1/dist-vol
+		Options Reconfigured:
+		transport.address-family: inet
+		nfs.disable: on
+		performance.client-io-threads: off
+
+  
 
   * _Client Testing_ : In the Client nodes we have installed IOR tools for Throuhput and IOPS testing .
 
