@@ -34,15 +34,15 @@
       
     },
     "clientId": {
-      "value": "fdebe363-1dea-48bf-8db0-b0a7835ce21f"
+      "value": ""
       
     },
     "clientSecret": {
-      "value": "Admin@123"
+      "value": ""
       
     },
     "tenantId": {
-      "value": "d280491c-b27a-41bf-9623-21b60cf430b3"
+      "value": ""
       
     },
     "adminUsername": {
@@ -50,7 +50,7 @@
      
     },
     "sshKeyData": {
-      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAoAsY8tOJusSEP9AJ7pKZRUJ6FSCD+3Z5F2wCZURcrfQwEvhVzZtQtWxcj1IzsBOzdx7MvTlPsOsJwsNSLXL5ydK3idiFuoVEmbYLp7/Hx8qVI5UIhUeyP2Fe6cU6e3PViUkEWVjV2BKYx7kDTPId0cChTj+UOEwhtWNSgwJSMg8fRQLogRYUGVShStGmrK2kk6u9ryNXHv1xeW2Ytbo/ubZmnUtSXs7q6Ay9YVLy0X8YmzGVSs6SUL97n5N8Hx6CLONZvEH5CNLLzH5h8ajmJWcwZwVDGVTKAEK2mcVqhH3vzD/4WbNefURvOV03tIYUEQ+Cf2XAOPmd7ziWfO3LYQ== rsa-key-20170613"
+      "value": ""
      
     },
     "storageDiskSize": {      
