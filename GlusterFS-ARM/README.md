@@ -71,6 +71,20 @@ You have to provide these parameters to the template :
 
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-client.json)
 
+## Deploy using azure cli
+
+To deploy the template using azure cli we have to use below steps-
+
+* Download the parameters file on local machin (gfsserver-parameters.json, gfsclient-parameters.json) using below commond-
+   wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsserver-parameters.json
+   wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsclient-parameters.json
+* Edit the parameters file, provide all the parameters.
+* To deploy gluster server and client use below command-
+  az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-server.json --parameters @gfsserver-parameters.json
+  az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-client.json --parameters @gfsclient-parameters.json
+
+
+
 
 ## Testing 
  
