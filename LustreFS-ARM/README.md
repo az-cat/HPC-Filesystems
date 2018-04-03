@@ -23,7 +23,7 @@ To setup Lustre three steps need to be executed :
 3. Deploy the Lustre Client
 
 ## Deploy the Lustre MDS/MGS
-Metadata servers (MDS) manage the names and directories in the file system and d.	Management servers (MGS) works as master node for the whole setup and contains the information about all the nodes attached within the cluster. 
+The MGS stores configuration information for all the Lustre file systems in a cluster and provides this information to other Lustre components. Each Lustre target contacts the MGS to provide information, and Lustre clients contact the MGS to retrieve information.
 
 You have to provide these parameters to the template :
 
@@ -49,6 +49,7 @@ Data in the Lustre filesystem is stored and retrieved by two components: the Obj
 
 A Lustre filesystem can have one or more OSS nodes. An OSS typically has between two and eight OSTs attached. To increase the storage capacity of the Lustre filesystem, additional OSTs can be attached. To increase the bandwidth of the Lustre filesystem, additional OSS can be attached.
 ## Provision the OSS nodes
+We used VM of size DS14_V2 and implemented RAID0 for all attached 10 additional data disks of 1 TB each.
 
 You have to provide these parameters to the template :
 
