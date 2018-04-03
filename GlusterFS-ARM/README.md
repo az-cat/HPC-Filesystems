@@ -7,19 +7,19 @@ Table of Contents
   * [Deploy the Gluster Server](#deploy-the-gluster-server)
   * [Deploy Gluster Client](#deploy-gluster-client)
   
-# Gluster
+# Gluster(3.12.6)
 
 Gluster file system provides a scalable parallel file system specially optimized for cloud storage. It does not have separate metadata servers, as metadata is integrated into file storage. It’s a free, scalable, open source distributed file system that works great for applications hosted on Azure.
 
 # Deployment steps
-To setup Gluster two steps need to be executed :
+To setup Gluster 3.12.6 version two steps need to be executed :
 1. Deploy the Gluster Server
 2. Deploy the Gluster Client
 
  ## Deploy the Glustre Server
 
  To get started, you need at least 4 nodes of any Linux distribution which will serve as server nodes (metadata server and storage server).
-GlusterFS can be installed on any Linux distribution. We have used CentOS 7.3 for tests. We used VM of size DS14_V2 and attached 10 additional data disks of 1 TB each with RAID0 Volume configuration. 
+GlusterFS can be installed on any Linux distribution. We have used CentOS 7.3 for tests. We used VM of size DS14_V2 and attached 10 additional data disks of 1 TB each, we created logical volume on top of RAID0. 
 
 Note- 
 * Before setup Gluster FS make sure you have service principal (id, secrete and tenant id) to get artifacts from Azure.
@@ -76,6 +76,20 @@ You have to provide these parameters to the template :
  
  Gluster Client template installed IOR tools for testing, as we have setup nfs for hpcuser and provided required permissions.
   * _Server Nodes testing_ : Login to the VMs run the command "df -h" you get the volume of 9T is you given 10 disks.
+  
+	  [adminuser@gfsmaster000000 ~]$ df -h
+	Filesystem                     Size  Used Avail Use% Mounted on
+	/dev/sda2                       30G  1.8G   28G   7% /
+	devtmpfs                       6.9G     0  6.9G   0% /dev
+	tmpfs                          6.9G     0  6.9G   0% /dev/shm
+	tmpfs                          6.9G  8.5M  6.9G   1% /run
+	tmpfs                          6.9G     0  6.9G   0% /sys/fs/cgroup
+	/dev/sda1                      497M   87M  411M  18% /boot
+	/dev/sdb1                       28G   45M   26G   1% /mnt/resource
+	tmpfs                          1.4G     0  1.4G   0% /run/user/0
+	/dev/mapper/rhgs--data-brick1  9.0T   34M  9.0T   1% /rhs/brick1
+	tmpfs                          1.4G     0  1.4G   0% /run/user/1000
+
   * _Server Master Node testing_ : Login to the VMs run the command "df -h" you get the volume of 9T if you given 10 disks, and run command "gluster volume info" and will get presented volume if server is not setup currectally it will show "No Volume Present".
 
   * _Client Testing_ : In the Client nodes we have installed IOR tools for Throuhput and IOPS testing .
