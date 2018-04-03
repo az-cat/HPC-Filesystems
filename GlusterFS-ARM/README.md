@@ -22,13 +22,13 @@ To setup Gluster two steps need to be executed :
 GlusterFS can be installed on any Linux distribution. We have used CentOS 7.3 for tests. We used VM of size DS14_V2 and attached 10 additional data disks of 1 TB each with RAID0 Volume configuration. 
 
 Note- 
-1. Before setup Gluster FS make sure you have service principal (id, secrete and tenant id) to get artifacts from Azure.
-2. Since we are using Distributed-replicated volume to cover high availability feature at least 4 Gluster server nodes would be required, for more than 4 make sure it should be multiple of 2.
-3. If want to create new vnet and subnet create new resource group and If using existing resource group make sure vnet and subnet name does not exist in the resource group.
-4. To manage fault tolrance, high availability is implemented using Distributed-Replicated volume.
-5. To setup Gluster server there are two VMSS is required which would be deployed using the template.
-   a. Without postfix "master", consist (n-1) no. of instances, for example if provided node count is 10 it consist 9.
-   b. With postfix "master", consist 1 node, here all the instances is peer and volume is created.
+* Before setup Gluster FS make sure you have service principal (id, secrete and tenant id) to get artifacts from Azure.
+* Since we are using Distributed-replicated volume to cover high availability feature at least 4 Gluster server nodes would be required, for more than 4 make sure it should be multiple of 2.
+* If want to create new vnet and subnet create new resource group and If using existing resource group make sure vnet and subnet name does not exist in the resource group.
+* To manage fault tolrance, high availability is implemented using Distributed-Replicated volume.
+* To setup Gluster server there are two VMSS is required which would be deployed using the template.
+   * Without postfix "master", consist (n-1) no. of instances, for example if provided node count is 10 it consist 9.
+   * With postfix "master", consist 1 node, here all the instances is peer and volume is created.
 
 You have to provide these parameters to the template :
 * _Location_ : Select the location. 
