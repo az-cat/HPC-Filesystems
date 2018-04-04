@@ -12,7 +12,7 @@ HPC_UID=7007
 HPC_GROUP=hpc
 HPC_GID=7007
 # Parameters 
-#DISKS_COUNT=$1
+JUMPBOX_NAME=$1
 
 #############################################################################
 
@@ -120,13 +120,13 @@ mount_nfs()
 setup_user()
 {
 	if is_centos; then
-		yum -y install nfs-utils nfs-utils-lib	
+		#yum -y install nfs-utils nfs-utils-lib	
 	fi
 
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
-	echo "$MASTER_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	echo "$JUMPBOX_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
    
@@ -189,7 +189,7 @@ fi
 
 raid0_volume
 setup_glusterserver
-
+setup_user
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
 exit 0
