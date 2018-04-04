@@ -119,9 +119,9 @@ mount_nfs()
 }
 setup_user()
 {
-	if is_centos; then
+	#if is_centos; then
 		#yum -y install nfs-utils nfs-utils-lib	
-	fi
+	#fi
 
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
