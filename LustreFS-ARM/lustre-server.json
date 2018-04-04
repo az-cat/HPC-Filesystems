@@ -70,7 +70,7 @@
       "metadata": {
         "description": "VM Image."
       }
-    },      
+    },
     "new/existingVnetName": {
       "type": "string",
       "metadata": {
@@ -119,6 +119,12 @@
         "description": "mgsNodeName ."
       }
     },
+    "jumpboxName": {
+      "type": "string",
+      "metadata": {
+        "description": "jumpboxName ."
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -163,6 +169,7 @@
     "subnetName": "[parameters('new/existingSubnetName')]",
     "vmssName": "[parameters('vmssName')]",
     "mgsNodeName": "[parameters('mgsNodeName')]",
+    "jumpboxName": "[parameters('jumpboxName')]",
     "nodeCount": "[parameters('nodeCount')]",
     "resourceGroup": "[resourceGroup().name]",
     "clientId": "[parameters('clientId')]",
@@ -467,7 +474,7 @@
                     "fileUris": [
                       "[uri(deployment().properties.templateLink.uri, 'scripts/install_lustre_storage.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash install_lustre_storage.sh ',variables('mgsNodeName'),' ',variables('templatelink'),' ',variables('vmssName'),' ',variables('resourceGroup'),' ',variables('clientId'),' ',variables('clientSecret'),' ',variables('tenantId'),' ',variables('nodeCount'))]"
+                    "commandToExecute": "[concat('bash install_lustre_storage.sh ',variables('mgsNodeName'),' ',variables('templatelink'),' ',variables('vmssName'),' ',variables('resourceGroup'),' ',variables('clientId'),' ',variables('clientSecret'),' ',variables('tenantId'),' ',variables('nodeCount'),' ',variables('jumpboxName'))]"
                   }
                 }
               }
