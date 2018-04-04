@@ -22,6 +22,7 @@ CLIENT_ID=$5
 CLIENT_SECRET=$6
 TENANT_ID=$7
 NODE_COUNT=$8
+JUMPBOX_NAME=$9
 
 echo "MGS - $MGMT_HOSTNAME Index - $OSS_INDEX and templatelink - $TEMPLATELINK"
 
@@ -119,7 +120,7 @@ setup_user()
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
-	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	echo "$JUMPBOX_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
    
