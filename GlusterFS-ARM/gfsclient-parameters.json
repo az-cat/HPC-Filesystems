@@ -35,6 +35,10 @@
       "value": ""
 
     },
+    "jumpboxName": {
+      "value": ""
+
+    },
     "adminUsername": {
       "value": "adminuser"
 
