@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmssName": {
-      "value": "lfsmaster"
+      "value": "jumpbox"
 
     },
     "nodeCount": {
@@ -41,11 +41,11 @@
       
     },
     "storageDiskSize": {
-      "value": "P30"
+      "value": "P10"
 
     },
     "StorageDisksCount": {
-      "value": 1
+      "value": 0
      
     }
   }
