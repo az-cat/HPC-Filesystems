@@ -108,7 +108,7 @@
     },
     "storageDiskSize": {
       "type": "string",
-      "defaultValue": "P30",
+      "defaultValue": "P10",
       "allowedValues": [
         "P10",
         "P20",
