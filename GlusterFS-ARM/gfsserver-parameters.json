@@ -4,7 +4,7 @@
   "parameters": {
     "vmssName": {
       "value": "gfsserver"
-      
+
     },
     "nodeCount": {
       "value": 4
@@ -15,50 +15,53 @@
     },
     "VMImage": {
       "value": "CentOS_7.3"
-      
-    },     
+
+    },
     "new/existingVnetName": {
       "value": "gluster-vnet"
-      
+
     },
     "new/ExistingSubnetName": {
       "value": "gluster-subnet"
-      
+
     },
     "subnetPrefix": {
       "value": "10.0.0.0/24"
-     
+
     },
     "addressPrefix": {
       "value": "10.0.0.0/16"
-      
+
     },
     "clientId": {
       "value": ""
-      
+
     },
     "clientSecret": {
       "value": ""
-      
+
     },
     "tenantId": {
       "value": ""
-      
+
     },
-    "adminUsername": {
-      "value": "adminuser"
-     
-    },
-    "sshKeyData": {
+    "jumpboxName": {
       "value": ""
-     
     },
-    "storageDiskSize": {      
-      "value": "P30"
-    },
-    "StorageDisksCount": {
-      "value": 10
-      
+      "adminUsername": {
+        "value": "adminuser"
+
+      },
+      "sshKeyData": {
+        "value": ""
+
+      },
+      "storageDiskSize": {
+        "value": "P30"
+      },
+      "StorageDisksCount": {
+        "value": 10
+
+      }
     }
   }
- }
