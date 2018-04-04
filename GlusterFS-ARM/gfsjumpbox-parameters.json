@@ -18,11 +18,11 @@
 
     },
     "new/existingVnetName": {
-      "value": "lustre-vnet"
+      "value": "gluster-vnet"
 
     },
     "new/existingSubnetName": {
-      "value": "lustre-subnet"
+      "value": "gluster-subnet"
 
     },
     "subnetPrefix": {
