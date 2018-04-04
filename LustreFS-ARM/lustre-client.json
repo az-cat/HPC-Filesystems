@@ -70,7 +70,7 @@
       "metadata": {
         "description": "VM Image."
       }
-    },     
+    },
     "new/existingVnetName": {
       "type": "string",
       "metadata": {
@@ -101,6 +101,12 @@
         "description": "mgsNodeName ."
       }
     },
+    "jumpboxName": {
+      "type": "string",
+      "metadata": {
+        "description": "jumpboxName ."
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -121,6 +127,7 @@
     "vnetRG": "[resourceGroup().name]",
     "subnetName": "[parameters('new/existingSubnetName')]",
     "mgsNodeName": "[parameters('mgsNodeName')]",
+    "jumpboxName": "[parameters('jumpboxName')]",
     "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
     "loadBalancerName": "[concat(parameters('vmssName'), 'lb')]",
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
@@ -371,7 +378,7 @@
                       "[uri(deployment().properties.templateLink.uri, 'scripts/install_lustre_client.sh')]",
                       "[uri(deployment().properties.templateLink.uri, 'scripts/LustrePack.repo')]"
                     ],
-                    "commandToExecute": "[concat('bash install_lustre_client.sh ',variables('mgsNodeName'),' ',variables('templatelink'))]"
+                    "commandToExecute": "[concat('bash install_lustre_client.sh ',variables('mgsNodeName'),' ',variables('templatelink'),' ',variables('jumpboxName'))]"
                   }
                 }
               }
