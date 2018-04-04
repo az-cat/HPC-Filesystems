@@ -21,7 +21,8 @@ Note- Before setup Gluster FS make sure you have service principal (id, secrete 
 To setup Lustre three steps need to be executed :
 1. Deploy the Lustre MDS/MGS
 2. Deploy the Lustre OSS
-3. Deploy the Lustre Client
+3. Deploy the jumpbox
+4. Deploy the Lustre Client
 
 ## Deploy the Lustre MDS/MGS
 The MGS stores configuration information for all the Lustre file systems in a cluster and provides this information to other Lustre components. Each Lustre target contacts the MGS to provide information, and Lustre clients contact the MGS to retrieve information.
