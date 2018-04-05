@@ -100,14 +100,15 @@ You have to provide these parameters to the template :
 
 To deploy the template using azure cli we have to use below steps-
 
-* Download the parameters file on local machin (gfsserver-parameters.json, gfsclient-parameters.json) using below commond-
+* Download the parameters file on local machin (gfsjumpbox-parameters.json, gfsserver-parameters.json and gfsclient-parameters.json) using below commond-
 
+  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsjumpbox-parameters.json
   * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsserver-parameters.json
-
   * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsclient-parameters.json
 
 * Edit the parameters file, provide all the parameters.
 * To deploy gluster server and client use below command-
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-jumpbox.json --parameters @gfsjumpbox-parameters.json
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-server.json --parameters @gfsserver-parameters.json
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-client.json --parameters @gfsclient-parameters.json
 
