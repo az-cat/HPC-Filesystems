@@ -4,6 +4,7 @@ Table of Contents
 =================
 * [Gluster](#Gluster)
 * [Deployment steps](#deployment-steps)
+  * [Deploy the Gluster Jumpbox](#deploy-the-gluster-jumpbox)
   * [Deploy the Gluster Server](#deploy-the-gluster-server)
   * [Deploy Gluster Client](#deploy-gluster-client)
   
@@ -13,10 +14,32 @@ Gluster file system provides a scalable parallel file system specially optimized
 
 # Deployment steps
 To setup Gluster 3.12.6 version two steps need to be executed :
-1. Deploy the Gluster Server
-2. Deploy the Gluster Client
+1. Deploy the Gluster Jumpbox
+2. Deploy the Gluster Server
+3. Deploy the Gluster Client
 
- ## Deploy the Glustre Server
+## Deploy the Lustre Jumpbox
+
+You have to provide these parameters to the template :
+
+* _Location_ : Select the same location where MDS/MGS is deployed.
+* _Vmss Name_ : Provide a name for prefix of VMs.
+* _Node Count_ : Provide node count as per requirment.
+* _VM Size_ : Select virtual machine size from the dropdown.
+* _VM Image_ : Select virtual machine Image from the dropdown.
+* _New/Existing Vnet Name_ : Enter the new or existing vnet name (for new Vnet/Subnet select resource group where vnet and subnet would be created ).
+* _New/Existing Subnet Name_ : Enter the existing subnet name (for new Vnet/Subnet select resource group where vnet and subnet would be created ).
+* _Subnet Prefix_ : Enter the subnet prefix of existing subnet for example 10.0.0.0/24 (for new Vnet/Subnet enter as per requirment).
+* _Address Prefix_ : Enter the Vnet Prefix of existing subnet for example 10.0.0.0/16 (for new Vnet/Subnet enter as per requirment).
+* _Mgs Node Name_: Provide the same name of MGS/MDS node .
+* _Admin User Name_ : This is the name of the administrator account to create on the VM.
+* _Ssh Key Data_ : The public SSH key to associate with the administrator user. Format has to be on a single line 'ssh-rsa key'.
+* _Storage Disk Size_ : select from the dropdown.
+* _Storage Disk Count_ : Provide the no. of storage disk as per requirement.
+
+
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-jumpbox.json) 
+## Deploy the Glustre Server
 
  To get started, you need at least 4 nodes of any Linux distribution which will serve as server nodes (metadata server and storage server).
 GlusterFS can be installed on any Linux distribution. We have used CentOS 7.3 for tests. We used VM of size DS14_V2 and attached 10 additional data disks of 1 TB each, we created logical volume on top of RAID0. 
@@ -43,6 +66,7 @@ You have to provide these parameters to the template :
 * _Client Id_ : Enter the client ID.
 * _Client secret_ : Enter the created client secret.
 * _Tenant Id_ : Enter the Tenant id.
+* _Jumpbox Name _ : Enter the host name of jumpbox.
 * _Admin Username_ : This is the name of the administrator account to create on the VM.
 * _SSH Key Data_ : The public SSH key to associate with the administrator user. Format has to be on a single line 'ssh-rsa key'
 * _Storage Disks Size_ : Select the disks size from the dropdown.
@@ -66,6 +90,7 @@ You have to provide these parameters to the template :
 * _Subnet Prefix_ : Enter the subnet prefix of existing subnet for example 10.0.0.0/24 (for new Vnet/Subnet enter as per requirment).
 * _Vnet Prefix_ :Enter the subnet prefix of existing subnet for example 10.0.0.0/16 (for new Vnet/Subnet enter as per requirment).
 * _Master Name_ : Enter the hostname of instance of VMSS which name is with postfix "master". 
+* _Jumpbox Name _ : Enter the host name of jumpbox.
 * _Admin Username_ : This is the name of the administrator account to create on the VM.
 * _SSH Key Data_ : The public SSH key to associate with the administrator user. Format has to be on a single line 'ssh-rsa key'
 
@@ -76,12 +101,15 @@ You have to provide these parameters to the template :
 To deploy the template using azure cli we have to use below steps-
 
 * Download the parameters file on local machin (gfsserver-parameters.json, gfsclient-parameters.json) using below commond-
-   wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsserver-parameters.json
-   wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsclient-parameters.json
+
+  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsserver-parameters.json
+
+   *wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsclient-parameters.json
+
 * Edit the parameters file, provide all the parameters.
 * To deploy gluster server and client use below command-
-  az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-server.json --parameters @gfsserver-parameters.json
-  az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-client.json --parameters @gfsclient-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-server.json --parameters @gfsserver-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gluster-client.json --parameters @gfsclient-parameters.json
 
 
 
