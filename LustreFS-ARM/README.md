@@ -134,6 +134,23 @@ You have to provide these parameters to the template :
 ## Deploy Lustre Client
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FLustreFS-ARM%2Flustre-client.json)
 
+## Deploy using azure cli
+
+To deploy the template using azure cli we have to use below steps-
+
+* Download the parameters file on local machin (gfsjumpbox-parameters.json, gfsserver-parameters.json and gfsclient-parameters.json) using below commond-
+
+  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-master-parameters.json
+  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-jumpbox-parameters.json
+  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-server-parameters.json
+  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-client-parameters.json
+
+* Edit the parameters file, provide all the parameters.
+* To deploy gluster server and client use below command-
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-master.json --parameters @lustre-master-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-jumpbox.json --parameters @lustre-jumpbox-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-server.json --parameters @lustre-server-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-client.json --parameters @lustre-client-parameters.json
 
 
 
