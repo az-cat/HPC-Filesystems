@@ -104,7 +104,7 @@ To deploy the template using azure cli we have to use below steps-
 
   * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsserver-parameters.json
 
-   *wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsclient-parameters.json
+  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/GlusterFS-ARM/gfsclient-parameters.json
 
 * Edit the parameters file, provide all the parameters.
 * To deploy gluster server and client use below command-
