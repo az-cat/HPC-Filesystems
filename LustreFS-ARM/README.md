@@ -9,6 +9,7 @@ Table of Contents
   * [Deploy the Lustre Jumpbox](#Deploy-the-Lustre-Jumpbox)
   * [Deploy Lustre OSS](#Deploy-Lustre-OSS)
   * [Deploy Lustre Client](#Deploy-Lustre-Client)
+  * [Deploy Using Azure cli](#Deploy-Using-Azure-Cli)
 
  
 # Lustre 2.9.0
