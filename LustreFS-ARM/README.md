@@ -102,11 +102,6 @@ You have to provide these parameters to the template :
 
 
 
-
-
-
-
-
 ## Deploy Lustre OSS
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FLustreFS-ARM%2Flustre-server.json)
 
