@@ -134,13 +134,7 @@ You have to provide these parameters to the template :
 
 To deploy the template using azure cli we have to use below steps-
 
-* Download the parameters file on local machin (gfsjumpbox-parameters.json, gfsserver-parameters.json and gfsclient-parameters.json) using below commond-
-
-  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-master-parameters.json
-  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-jumpbox-parameters.json
-  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-server-parameters.json
-  * wget https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-client-parameters.json
-
+* Download the parameters file (lustre-master-parameters.json, lustre-jumpbox-parameters.json, lustre-server-parameters.json and lustre-client-parameters.json) on local machin . 
 * Edit the parameters file, provide all the parameters.
 * To deploy gluster server and client use below command-
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/LustreFS-ARM/lustre-master.json --parameters @lustre-master-parameters.json
