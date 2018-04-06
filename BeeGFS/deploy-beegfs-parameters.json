@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmssName": {
-      "value": ""   
+      "value": "beegfsserver"   
     },
     "nodeType": {
-      "value": "all"
+      "value": "both"
     },
     "nodeCount": {
       "value": 1     
