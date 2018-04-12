@@ -83,6 +83,17 @@ trusted_pool()
 	done
 	 
 }
+trusted_pool_repeat()
+{
+	a=0
+	while [ $a -lt 2 ]
+	do
+	   trusted_pool
+	   sleep 10
+
+	   a=`expr $a + 1`
+	done
+}
 setup_gluster_volume()
 {
 		VOLUME=($(azure_access))
@@ -111,7 +122,7 @@ if is_centos; then
 fi
 
 install_basetools
-trusted_pool
+trusted_pool_repeat
 setup_gluster_volume
 
 # Create marker file so we know we're configured
