@@ -18,7 +18,9 @@ To setup Gluster 3.12.6 version two steps need to be executed :
 2. Deploy the Gluster Server
 3. Deploy the Gluster Client
 
-## Deploy the Lustre Jumpbox
+Note - We have to deploy jumpbox, server and client sequencially.
+
+## Deploy the Gluster Jumpbox
 
 You have to provide these parameters to the template :
 
@@ -31,7 +33,6 @@ You have to provide these parameters to the template :
 * _New/Existing Subnet Name_ : Enter the existing subnet name (for new Vnet/Subnet select resource group where vnet and subnet would be created ).
 * _Subnet Prefix_ : Enter the subnet prefix of existing subnet for example 10.0.0.0/24 (for new Vnet/Subnet enter as per requirment).
 * _Address Prefix_ : Enter the Vnet Prefix of existing subnet for example 10.0.0.0/16 (for new Vnet/Subnet enter as per requirment).
-* _Mgs Node Name_: Provide the same name of MGS/MDS node .
 * _Admin User Name_ : This is the name of the administrator account to create on the VM.
 * _Ssh Key Data_ : The public SSH key to associate with the administrator user. Format has to be on a single line 'ssh-rsa key'.
 * _Storage Disk Size_ : select from the dropdown.
