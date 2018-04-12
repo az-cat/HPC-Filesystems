@@ -70,7 +70,7 @@
       "metadata": {
         "description": "VM Image."
       }
-    },     
+    },
     "new/existingVnetName": {
       "type": "string",
       "metadata": {
@@ -113,6 +113,12 @@
         "description": "ClientSecret for az login."
       }
     },
+    "jumpboxName": {
+      "type": "string",
+      "metadata": {
+        "description": "jumpboxName ."
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -152,6 +158,7 @@
     "subnetPrefix": "[parameters('subnetPrefix')]",
     "virtualNetworkName": "[parameters('new/existingVnetName')]",
     "vmssname": "[parameters('vmssName')]",
+    "jumpboxName": "[parameters('jumpboxName')]",
     "nodes": "[div(parameters('nodeCount'), 2)]",
     "nodeCount": "[add(parameters('nodeCount'), -1)]",
     "clientId": "[parameters('clientId')]",
@@ -528,7 +535,7 @@
                     "fileUris": [
                       "[uri(deployment().properties.templateLink.uri, 'Scripts/gluster-server.sh')]"
                     ],
-                    "commandToExecute": "bash gluster-server.sh"
+                    "commandToExecute": "[ concat('bash gluster-server.sh ', variables('jumpboxName')) ]"
                   }
                 }
               }
@@ -627,11 +634,11 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": [
-                     "[uri(deployment().properties.templateLink.uri, 'Scripts/gluster-server.sh')]",
-                      "[uri(deployment().properties.templateLink.uri, 'Scripts/gluster-volume.sh')]",
-                      "[uri(deployment().properties.templateLink.uri, 'Scripts/nfs-server.sh')]"
+                      "[uri(deployment().properties.templateLink.uri, 'Scripts/gluster-server.sh')]",
+                      "[uri(deployment().properties.templateLink.uri, 'Scripts/gluster-volume.sh')]"
+                      
                     ],
-                    "commandToExecute": "[concat('bash gluster-server.sh ',';' ,'bash gluster-volume.sh ', variables('vmssname'),' ',variables('rgname'),' ',variables('clientId'),' ',variables('clientSecret'),' ',variables('tenantId'),' ',variables('nodes'),';','bash nfs-server.sh ' )]"
+                    "commandToExecute": "[concat('bash gluster-server.sh ', variables('jumpboxName'),';' ,'bash gluster-volume.sh ', variables('vmssname'),' ',variables('rgname'),' ',variables('clientId'),' ',variables('clientSecret'),' ',variables('tenantId'),' ',variables('nodes'))]"
                   }
                 }
               }

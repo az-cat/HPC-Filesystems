@@ -1,0 +1,67 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmssName": {
+      "value": "gfsserver"
+
+    },
+    "nodeCount": {
+      "value": 4
+
+    },
+    "VMSize": {
+      "value": "Standard_DS3_v2"
+    },
+    "VMImage": {
+      "value": "CentOS_7.3"
+
+    },
+    "new/existingVnetName": {
+      "value": "gluster-vnet"
+
+    },
+    "new/ExistingSubnetName": {
+      "value": "gluster-subnet"
+
+    },
+    "subnetPrefix": {
+      "value": "10.0.0.0/24"
+
+    },
+    "addressPrefix": {
+      "value": "10.0.0.0/16"
+
+    },
+    "clientId": {
+      "value": ""
+
+    },
+    "clientSecret": {
+      "value": ""
+
+    },
+    "tenantId": {
+      "value": ""
+
+    },
+    "jumpboxName": {
+      "value": ""
+    },
+      "adminUsername": {
+        "value": "adminuser"
+
+      },
+      "sshKeyData": {
+        "value": ""
+
+      },
+      "storageDiskSize": {
+        "value": "P30"
+      },
+      "StorageDisksCount": {
+        "value": 10
+
+      }
+    }
+  }

@@ -101,6 +101,12 @@
         "description": "Mastername for NFS setup."
       }
     },
+    "jumpboxName": {
+      "type": "string",
+      "metadata": {
+        "description": "jumpboxName ."
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -119,6 +125,7 @@
     "subnetPrefix": "[parameters('subnetPrefix')]",
     "virtualNetworkName": "[parameters('new/existingVnetName')]",
     "rgname": "[resourceGroup().name]",
+    "jumpboxName": "[parameters('jumpboxName')]",
     "masterName": "[parameters('masterName')]",
     "subnetName": "[parameters('new/existingSubnetName')]",
     "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
@@ -368,7 +375,7 @@
                     "fileUris": [
                       "[uri(deployment().properties.templateLink.uri, 'Scripts/gluster-client.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash gluster-client.sh ', variables('masterName'))]"
+                    "commandToExecute": "[concat('bash gluster-client.sh ', variables('masterName'),' ',variables('jumpboxName'))]"
                   }
                 }
               }

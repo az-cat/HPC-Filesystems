@@ -18,6 +18,7 @@ HPC_GID=7007
 
 # Parameter
 MASTER_NAME=$1
+JUMPBOX_NAME=$2
 
 #############################################################################
 
@@ -56,7 +57,7 @@ setup_user()
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
-	echo "$MASTER_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	echo "$JUMPBOX_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
    

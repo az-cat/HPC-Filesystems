@@ -16,12 +16,12 @@
       },
       "defaultValue": 1,
       "minValue": 1,
-      "maxValue": 100
+      "maxValue": 1
 
     },
     "VMSize": {
       "type": "string",
-      "defaultValue": "Standard_DS14_v2",
+      "defaultValue": "Standard_DS3_v2",
       "allowedValues": [
         "Standard_DS1",
         "Standard_DS2",
@@ -64,13 +64,12 @@
       "type": "string",
       "defaultValue": "CentOS_7.3",
       "allowedValues": [
-        "CentOS_7.2",
         "CentOS_7.3"
       ],
       "metadata": {
         "description": "VM Image."
       }
-    },
+    },   
     "new/existingVnetName": {
       "type": "string",
       "metadata": {
@@ -95,18 +94,6 @@
         "description": "existing subnet name"
       }
     },
-    "mgsNodeName": {
-      "type": "string",
-      "metadata": {
-        "description": "mgsNodeName ."
-      }
-    },
-    "jumpboxName": {
-      "type": "string",
-      "metadata": {
-        "description": "jumpboxName ."
-      }
-    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -118,18 +105,42 @@
       "metadata": {
         "description": "SSH rsa public key file as a string."
       }
+    },
+    "storageDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the storage services"
+      }
+    },
+    "StorageDisksCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 0,
+      "maxValue": 1,
+      "metadata": {
+        "description": "Number of storage disks"
+      }
     }
   },
   "variables": {
     "addressPrefix": "[parameters('addressPrefix')]",
     "subnetPrefix": "[parameters('subnetPrefix')]",
     "virtualNetworkName": "[parameters('new/existingVnetName')]",
-    "vnetRG": "[resourceGroup().name]",
+    "vmsscount": 2,
+    "vmssNameVolume": "[concat(parameters('vmssName'), 'last')]",
+    "vmssCountVolume": 1,
+    "templatelink": "[uri(deployment().properties.templateLink.uri, 'Scripts')]",
     "subnetName": "[parameters('new/existingSubnetName')]",
-    "mgsNodeName": "[parameters('mgsNodeName')]",
-    "jumpboxName": "[parameters('jumpboxName')]",
     "publicIPAddressName": "[concat(parameters('vmssName'), 'pip')]",
+    "publicIPAddressName2": "[concat(parameters('vmssName'), 'pip2')]",
     "loadBalancerName": "[concat(parameters('vmssName'), 'lb')]",
+    "loadBalancerName1": "[concat(parameters('vmssName'), 'lb1')]",
     "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
     "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName'))]",
     "natPoolName": "[concat(parameters('vmssName'), 'natpool')]",
@@ -137,6 +148,9 @@
     "natStartPort": 50000,
     "natEndPort": 52000,
     "natBackendPort": 22,
+    "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
+    "numStorageDisks": "[parameters('storageDisksCount')]",
+    "numMetadataDisks": 0,
     "nicName": "[concat(parameters('vmssName'), 'nic')]",
     "ipConfigName": "[concat(parameters('vmssName'), 'ipconfig')]",
     "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/loadBalancerFrontEnd')]",
@@ -144,14 +158,6 @@
     "insightsApiVersion": "2015-04-01",
     "location": "[resourceGroup().location]",
     "installLIS": "bash InstallLIS.sh",
-    "templatelink": "[uri(deployment().properties.templateLink.uri, 'Scripts')]",
-    "installLIS": "bash InstallLIS.sh",
-    "networkSettings": {
-      "addressPrefix": "10.0.0.0/20",
-      "lustreSubnetPrefix": "10.0.0.0/21",
-      "lustresubnetRef": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/',variables('vnetRG'), '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
-    },
-
     "PremiumStorageMap": {
       "P10": {
         "size": 128
@@ -166,25 +172,25 @@
     "image": "[parameters('VMImage')]",
     "lustreNodeSettings": {
       "VMsku": "[parameters('VMSize')]",
-      "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-      "vnetRG": "[resourceGroup().name]",
-      "vnetName": "[variables('virtualNetworkName')]",
-      "subnetName": "[variables('subnetName')]"
+      "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
+      "numStorageDisks": "[parameters('storageDisksCount')]",
+      "numStorageDisksLast": 1,
+      "numMetadataDisks": 0
     },
     "computeNodeImages": {
-      "CentOS_7.2": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS",
-        "sku": "7.2",
-        "version": "latest"
-      },
       "CentOS_7.3": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "7.3",
         "version": "latest"
       },
-      "RHEL_7.2": {
+      "CentOS_7.2": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.2",
+        "version": "latest"
+      },
+      "RHEL_7.3": {
         "publisher": "RedHat",
         "offer": "RHEL",
         "sku": "7.2",
@@ -197,10 +203,59 @@
       "imageReference": "[variables('computeNodeImages')[variables('image')]]"
     },
     "computeApiVersion": "2016-04-30-preview",
-    "vnetID": "[resourceId(variables('lustreNodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', variables('lustreNodeSettings').vnetName)]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/', variables('lustreNodeSettings').subnetName)]",
     "sshKeyPath": "[concat('/home/',variables('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
-    "lustreInstall": "[concat('bash install_lustre.sh ', 'lustre000000', ' client')]"
+    "storageDiskArray": [
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 0)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 1)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 2)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 3)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 4)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 5)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 6)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 7)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 8)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('lustreNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('lustreNodeSettings').numMetadataDisks, 9)]",
+        "createOption": "Empty"
+      }
+    ]
   },
   "resources": [
     {
@@ -223,7 +278,7 @@
           }
         ]
       }
-    },
+    },   
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIPAddressName')]",
@@ -242,7 +297,7 @@
       "location": "[variables('location')]",
       "apiVersion": "[variables('networkApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]"
+        "[concat('Microsoft.Network/publicIPAddresses/',variables('publicIPAddressName'))]"
       ],
       "properties": {
         "frontendIPConfigurations": [
@@ -298,7 +353,7 @@
         "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
       ],
       "sku": {
-        "name": "[parameters('VMSize')]",
+        "name": "[variables('lustreNodeSettings').VMsku]",
         "tier": "Standard",
         "capacity": "[parameters('nodeCount')]"
       },
@@ -311,10 +366,12 @@
           "storageProfile": {
             "osDisk": {
               "createOption": "FromImage",
-              "caching": "ReadOnly"
+              "managedDisk": {
+                "storageAccountType": "Premium_LRS"
+              }
             },
             "imageReference": "[variables('nodeOSSettings').imageReference]",
-            "dataDisks": []
+            "dataDisks": "[concat(take(variables('storageDiskArray'),variables('lustreNodeSettings').numStorageDisks))]"
           },
           "osProfile": {
             "computerNamePrefix": "[parameters('vmssName')]",
@@ -342,7 +399,7 @@
                       "name": "[variables('ipConfigName')]",
                       "properties": {
                         "subnet": {
-                          "id": "[variables('networkSettings').lustreSubnetRef]"
+                          "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
                         },
                         "loadBalancerBackendAddressPools": [
                           {
@@ -375,10 +432,9 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": [
-                      "[uri(deployment().properties.templateLink.uri, 'scripts/install_lustre_client.sh')]",
-                      "[uri(deployment().properties.templateLink.uri, 'scripts/LustrePack.repo')]"
+                      "[uri(deployment().properties.templateLink.uri, 'scripts/install_lustre_jumpbox.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash install_lustre_client.sh ',variables('mgsNodeName'),' ',variables('templatelink'),' ',variables('jumpboxName'))]"
+                    "commandToExecute": "bash install_lustre_jumpbox.sh"
                   }
                 }
               }
@@ -386,6 +442,7 @@
           }
         }
       }
-    }  
+    }
+
   ]
 }

@@ -21,6 +21,7 @@ fi
 
 MGMT_HOSTNAME=$1
 TEMPLATELINK=$2
+JUMPBOX_NAME=$3
 
 echo "MGS - $MGMT_HOSTNAME and templatelink - $TEMPLATELINK"
 
@@ -49,7 +50,7 @@ setup_user()
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
-	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	echo "$JUMPBOX_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
    

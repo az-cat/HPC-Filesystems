@@ -1,0 +1,38 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmssName": {
+      "value": "beegfsmaster"     
+    },
+    "nodeCount": {
+      "value":1     
+    },
+    "VMSize": {      
+      "value": "Standard_DS3_v2"      
+    },
+    "VMImage": {      
+      "value": "CentOS_7.2"      
+    },
+    "new/existingVnetName": {
+      "value": "beegfs-vnet"     
+    },
+    "new/existingSubnetName": {
+      "value": "beegfs-subnet"     
+    },
+    "subnetPrefix": {
+      "value": "10.0.0.0/24"      
+    },
+    "addressPrefix": {
+      "value": "10.0.0.0/16"
+    
+    },
+    "adminUsername": {
+      "value": "adminuser"      
+    },
+    "sshKeyData": {
+      "value": ""      
+    }
+  }
+ 
+}

@@ -13,8 +13,8 @@ Table of Contents
   * [Deploy Lustre Client](#Deploy-Lustre-Client)
 
  
-# Lustre
-Lustre is currently the most widely used parallel file system in HPC solutions. Lustre file systems can scale to tens of thousands of client nodes, tens of petabytes of storage. Lustre file system performed well for large file system, you can refer the testing results for the same.
+# Lustre 2.9.0
+The MGS stores configuration information for all the Lustre file systems in a cluster and provides this information to other Lustre components. Each Lustre target contacts the MGS to provide information, and Lustre clients contact the MGS to retrieve information.
 
 # Deployment steps
 To setup Lustre three steps need to be executed :
@@ -26,7 +26,7 @@ To setup Lustre three steps need to be executed :
 Metadata servers (MDS) manage the names and directories in the file system and d.	Management servers (MGS) works as master node for the whole setup and contains the information about all the nodes attached within the cluster. 
 
 You have to provide these parameters to the template :
-* _Location_ : Select the location where NC series is available(for example East US,South Central US). 
+* _Location_ : Select the location. 
 * _Virtual Machine Name_ : Enter the virtual machine name. 
 * _Virtual Machine Size_ : Select virtual machine size from the dropdown.
 * _Admin Username_ : This is the name of the administrator account to create on the VM.
@@ -39,7 +39,7 @@ Data in the Lustre filesystem is stored and retrieved by two components: the Obj
 
 A Lustre filesystem can have one or more OSS nodes. An OSS typically has between two and eight OSTs attached. To increase the storage capacity of the Lustre filesystem, additional OSTs can be attached. To increase the bandwidth of the Lustre filesystem, additional OSS can be attached.
 ## Provision the OSS nodes
-
+We used VM of size DS14_V2 and implemented RAID0 for all attached 10 additional data disks of 1 TB each.
 You have to provide these parameters to the template :
 * _Location_ : Select the same location where MDS/MGS is deployed.
 * _Virtual Machine Name Prefix_ : Provide a name for prefix of VMs.
@@ -72,6 +72,19 @@ You have to provide these parameters to the template :
 
 ## Deploy Lustre Client
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FLustre%2Flustre-client.json)
+
+## Deploy using azure cli
+
+To deploy the template using azure cli we have to use below steps-
+
+* Download the parameters file (lustre-master-parameters.json, lustre-storage-parameters.json and lustre-client-parameters.json) on local machin . 
+* Edit the parameters file, provide all the parameters.
+* To deploy gluster server and client use below command-
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-master.json --parameters @lustre-master-parameters.json 
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-storage.json --parameters @lustre-storage-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-client.json --parameters @lustre-client-parameters.json
+
+
 
 
 
