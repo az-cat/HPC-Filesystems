@@ -79,7 +79,7 @@ To deploy the template using azure cli we have to use below steps-
 
 * Download the parameters file (lustre-master-parameters.json, lustre-storage-parameters.json and lustre-client-parameters.json) on local machin . 
 * Edit the parameters file, provide all the parameters.
-* To deploy lustre managment, jumpbox, servers and client use below command-
+* To deploy lustre managment, servers and client use below command-
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-master.json --parameters @lustre-master-parameters.json 
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-storage.json --parameters @lustre-storage-parameters.json
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-client.json --parameters @lustre-client-parameters.json
