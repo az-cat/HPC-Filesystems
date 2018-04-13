@@ -40,7 +40,7 @@ You have to provide these parameters to the template :
 
 
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-jumpbox.json) 
-## Deploy the Glustre Server
+## Deploy the Gluster Server
 
  To get started, you need at least 4 nodes of any Linux distribution which will serve as server nodes (metadata server and storage server).
 GlusterFS can be installed on any Linux distribution. We have used CentOS 7.3 for tests. We used VM of size DS14_V2 and attached 10 additional data disks of 1 TB each, we created logical volume on top of RAID0. 
@@ -77,7 +77,7 @@ You have to provide these parameters to the template :
 
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-server.json) 
 
-## Deploy Glustre Client
+## Deploy Gluster Client
 
 You have to provide these parameters to the template :
 * _Location_ : Select the location. 
