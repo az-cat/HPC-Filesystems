@@ -327,18 +327,6 @@
               "frontendPortRangeEnd": "[variables('natEndPort')]",
               "backendPort": "[variables('natBackendPort')]"
             }
-          },
-          {
-            "name": "natpool2",
-            "properties": {
-              "frontendIPConfiguration": {
-                "id": "[variables('frontEndIPConfigID')]"
-              },
-              "protocol": "tcp",
-              "frontendPortRangeStart": "9000",
-              "frontendPortRangeEnd": "9120",
-              "backendPort": "9000"
-            }
           }
         ]
       }
@@ -409,9 +397,6 @@
                         "loadBalancerInboundNatPools": [
                           {
                             "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
-                          },
-                          {
-                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/natpool2')]"
                           }
                         ]
                       }
