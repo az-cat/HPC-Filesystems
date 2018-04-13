@@ -50,7 +50,9 @@ Note-
 * Since we are using Distributed-replicated volume to cover high availability feature at least 4 Gluster server nodes would be required, for more than 4 make sure it should be multiple of 2.
 * If want to create new vnet and subnet create new resource group and If using existing resource group make sure vnet and subnet name does not exist in the resource group.
 * To manage fault tolrance, high availability is implemented using Distributed-Replicated volume.
-* To setup Gluster server there are two VMSS is required which would be deployed using the template.
+* To setup Gluster server there are two VMSS is required, because to setup gluster volume, all the server instances should be peer on a particular node where volume would be creted.
+  During the provisioning of VMSS all the node provisioned parallelly and scripts in extension run on all the node, so we can not run the sparate script on any perticullar node to peer other nodes and create volume.
+  it is the reason for creating two VMSS.
    * Without postfix "master", consist (n-1) no. of instances, for example if provided node count is 10 it consist 9.
    * With postfix "master", consist 1 node, here all the instances is peer and volume is created.
 
