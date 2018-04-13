@@ -12,7 +12,7 @@ Table of Contents
   * [Deploy Lustre OSS](#Deploy-Lustre-OSS)
   * [Deploy Lustre Client](#Deploy-Lustre-Client)
 
- 
+ Note - We have to deploy managment, server and client sequencially.
 # Lustre 2.9.0
 The MGS stores configuration information for all the Lustre file systems in a cluster and provides this information to other Lustre components. Each Lustre target contacts the MGS to provide information, and Lustre clients contact the MGS to retrieve information.
 
