@@ -98,8 +98,8 @@ fi
 
 
 setup_disks
-mount_nfs
-setup_user
+#mount_nfs
+#setup_user
 
 
 # Create marker file so we know we're configured
