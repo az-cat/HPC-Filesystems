@@ -11,7 +11,7 @@ Table of Contents
   * [Deploy Lustre Client](#Deploy-Lustre-Client)
   * [Deploy Using Azure cli](#Deploy-Using-Azure-Cli)
 
-Note - We have to deploy managment, jumpbox, server and client sequencially.
+
  
 # Lustre 2.9.0
 Lustre is currently the most widely used open source parallel file system in HPC solutions. Lustre file systems can scale to tens of thousands of client nodes, tens of petabytes of storage. Lustre file system performed well for large file system, you can refer the testing results for the same.
@@ -25,6 +25,8 @@ To setup Lustre three steps need to be executed :
 2. Deploy the Lustre OSS
 3. Deploy the jumpbox
 4. Deploy the Lustre Client
+
+Note - We have to deploy managment, jumpbox, server and client sequencially.
 
 ## Deploy the Lustre MDS/MGS
 The MGS stores configuration information for all the Lustre file systems in a cluster and provides this information to other Lustre components. Each Lustre target contacts the MGS to provide information, and Lustre clients contact the MGS to retrieve information.

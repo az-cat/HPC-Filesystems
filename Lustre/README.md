@@ -12,7 +12,7 @@ Table of Contents
   * [Deploy Lustre OSS](#Deploy-Lustre-OSS)
   * [Deploy Lustre Client](#Deploy-Lustre-Client)
 
- Note - We have to deploy managment, server and client sequencially.
+ 
 # Lustre 2.9.0
 The MGS stores configuration information for all the Lustre file systems in a cluster and provides this information to other Lustre components. Each Lustre target contacts the MGS to provide information, and Lustre clients contact the MGS to retrieve information.
 
@@ -21,6 +21,8 @@ To setup Lustre three steps need to be executed :
 1. Deploy the Lustre MDS/MGS
 2. Deploy the Lustre OSS
 3. Deploy the Lustre Client
+
+Note - We have to deploy managment, server and client sequencially.
 
 ## Deploy the Lustre MDS/MGS
 Metadata servers (MDS) manage the names and directories in the file system and d.	Management servers (MGS) works as master node for the whole setup and contains the information about all the nodes attached within the cluster. 
