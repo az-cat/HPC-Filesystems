@@ -18,7 +18,9 @@ To setup Gluster 3.12.6 version two steps need to be executed :
 2. Deploy the Gluster Server
 3. Deploy the Gluster Client
 
-## Deploy the Lustre Jumpbox
+Note - We have to deploy jumpbox, server and client sequencially.
+
+## Deploy the Gluster Jumpbox
 
 You have to provide these parameters to the template :
 
@@ -31,7 +33,6 @@ You have to provide these parameters to the template :
 * _New/Existing Subnet Name_ : Enter the existing subnet name (for new Vnet/Subnet select resource group where vnet and subnet would be created ).
 * _Subnet Prefix_ : Enter the subnet prefix of existing subnet for example 10.0.0.0/24 (for new Vnet/Subnet enter as per requirment).
 * _Address Prefix_ : Enter the Vnet Prefix of existing subnet for example 10.0.0.0/16 (for new Vnet/Subnet enter as per requirment).
-* _Mgs Node Name_: Provide the same name of MGS/MDS node .
 * _Admin User Name_ : This is the name of the administrator account to create on the VM.
 * _Ssh Key Data_ : The public SSH key to associate with the administrator user. Format has to be on a single line 'ssh-rsa key'.
 * _Storage Disk Size_ : select from the dropdown.
@@ -39,7 +40,7 @@ You have to provide these parameters to the template :
 
 
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-jumpbox.json) 
-## Deploy the Glustre Server
+## Deploy the Gluster Server
 
  To get started, you need at least 4 nodes of any Linux distribution which will serve as server nodes (metadata server and storage server).
 GlusterFS can be installed on any Linux distribution. We have used CentOS 7.3 for tests. We used VM of size DS14_V2 and attached 10 additional data disks of 1 TB each, we created logical volume on top of RAID0. 
@@ -49,7 +50,9 @@ Note-
 * Since we are using Distributed-replicated volume to cover high availability feature at least 4 Gluster server nodes would be required, for more than 4 make sure it should be multiple of 2.
 * If want to create new vnet and subnet create new resource group and If using existing resource group make sure vnet and subnet name does not exist in the resource group.
 * To manage fault tolrance, high availability is implemented using Distributed-Replicated volume.
-* To setup Gluster server there are two VMSS is required which would be deployed using the template.
+* To setup Gluster server there are two VMSS is required, because to setup gluster volume, all the server instances should be peer on a particular node where volume would be creted.
+  During the provisioning of VMSS all the node provisioned parallelly and scripts in extension run on all the node, so we can not run the sparate script on any perticullar node to peer other nodes and create volume.
+  it is the reason for creating two VMSS.
    * Without postfix "master", consist (n-1) no. of instances, for example if provided node count is 10 it consist 9.
    * With postfix "master", consist 1 node, here all the instances is peer and volume is created.
 
@@ -76,7 +79,7 @@ You have to provide these parameters to the template :
 
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Faz-cat%2FHPC-Filesystems%2Fmaster%2FGlusterFS-ARM%2Fgluster-server.json) 
 
-## Deploy Glustre Client
+## Deploy Gluster Client
 
 You have to provide these parameters to the template :
 * _Location_ : Select the location. 

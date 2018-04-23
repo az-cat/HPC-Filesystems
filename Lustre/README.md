@@ -22,6 +22,8 @@ To setup Lustre three steps need to be executed :
 2. Deploy the Lustre OSS
 3. Deploy the Lustre Client
 
+Note - We have to deploy managment, server and client sequencially.
+
 ## Deploy the Lustre MDS/MGS
 Metadata servers (MDS) manage the names and directories in the file system and d.	Management servers (MGS) works as master node for the whole setup and contains the information about all the nodes attached within the cluster. 
 
@@ -79,7 +81,7 @@ To deploy the template using azure cli we have to use below steps-
 
 * Download the parameters file (lustre-master-parameters.json, lustre-storage-parameters.json and lustre-client-parameters.json) on local machin . 
 * Edit the parameters file, provide all the parameters.
-* To deploy gluster server and client use below command-
+* To deploy lustre managment, servers and client use below command-
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-master.json --parameters @lustre-master-parameters.json 
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-storage.json --parameters @lustre-storage-parameters.json
   * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/Lustre/lustre-client.json --parameters @lustre-client-parameters.json
