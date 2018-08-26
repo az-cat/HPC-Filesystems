@@ -66,8 +66,8 @@ To deploy the template using azure cli we have to use below steps-
 * Download the parameters file (beegfs-master-parameters.json, deploy-beegfs-parameters.json) on local machin .
 * Edit the parameters file, provide all the parameters.
 * To deploy gluster server and client use below command-
-  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/mastercopy/BeeGFS/beegfs-master.json --parameters beegfs-master-parameters.json
-  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/mastercopy/BeeGFS/deploy-beegfs.json --parameters deploy-beegfs-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/BeeGFS/beegfs-master.json --parameters beegfs-master-parameters.json
+  * az group deployment create -g {Resource group} --template-uri https://raw.githubusercontent.com/az-cat/HPC-Filesystems/master/BeeGFS/deploy-beegfs.json --parameters deploy-beegfs-parameters.json
 
   Note - To deploy the HDD template same parameter file can be use.
 
