@@ -62,9 +62,9 @@
     },
     "VMImage": {
       "type": "string",
-      "defaultValue": "CentOS_7.3",
+      "defaultValue": "CentOS_7.6",
       "allowedValues": [
-        "CentOS_7.3"
+        "CentOS_7.6"
       ],
       "metadata": {
         "description": "VM Image."
@@ -178,22 +178,10 @@
       "numMetadataDisks": 0
     },
     "computeNodeImages": {
-      "CentOS_7.3": {
+      "CentOS_7.6": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
-        "sku": "7.3",
-        "version": "latest"
-      },
-      "CentOS_7.2": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS",
-        "sku": "7.2",
-        "version": "latest"
-      },
-      "RHEL_7.3": {
-        "publisher": "RedHat",
-        "offer": "RHEL",
-        "sku": "7.2",
+        "sku": "7.6",
         "version": "latest"
       }
     },
