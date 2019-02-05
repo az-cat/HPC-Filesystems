@@ -22,7 +22,6 @@ CLIENT_ID=$5
 CLIENT_SECRET=$6
 TENANT_ID=$7
 NODE_COUNT=$8
-JUMPBOX_NAME=$9
 
 echo "MGS - $MGMT_HOSTNAME Index - $OSS_INDEX and templatelink - $TEMPLATELINK"
 
@@ -120,7 +119,7 @@ setup_user()
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
-	echo "$JUMPBOX_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
    
@@ -146,13 +145,13 @@ install_lustre_repo()
 
 install_lustre()
 {
-	 yum -y install kernel-3.10.0-514.el7_lustre.x86_64
-     yum -y install lustre-2.9.0-1.el7.x86_64
-     yum -y install kmod-lustre-2.9.0-1.el7.x86_64
-     yum -y install kmod-lustre-osd-ldiskfs-2.9.0-1.el7.x86_64
-     yum -y install lustre-osd-ldiskfs-mount-2.9.0-1.el7.x86_64
+     yum -y install kernel-3.10.0-957.el7_lustre.x86_64
+     yum -y install lustre
+     yum -y install kmod-lustre
+     yum -y install kmod-lustre-osd-ldiskfs
+     yum -y install lustre-osd-ldiskfs-mount
      yum -y install e2fsprogs
-     yum -y install lustre-tests-2.9.0-1.el7.x86_64
+     yum -y install lustre-tests
 
      echo “options lnet networks=tcp”> /etc/modprobe.d/lnet.conf
      chkconfig lnet --add

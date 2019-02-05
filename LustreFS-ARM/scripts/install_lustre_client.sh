@@ -78,9 +78,9 @@ install_lustre_repo()
 
 install_lustre()
 {
-	yum -y install kmod-lustre-client-2.9.0-1.el7.x86_64
-	yum -y install lustre-client-2.9.0-1.el7.x86_64
-	yum -y install lustre-client-dkms-2.9.0-1.el7.noarch --skip-broken
+	yum -y install kmod-lustre-client
+	yum -y install lustre-client
+	yum -y install lustre-client-dkms --skip-broken
 }
 
 install_ior()

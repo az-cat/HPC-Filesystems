@@ -124,13 +124,13 @@ install_lustre()
 	# setup metata data
     if is_metadatanode; then
 		
-        yum -y install kernel-3.10.0-514.el7_lustre.x86_64
-        yum -y install lustre-2.9.0-1.el7.x86_64
-        yum -y install kmod-lustre-2.9.0-1.el7.x86_64
-        yum -y install kmod-lustre-osd-ldiskfs-2.9.0-1.el7.x86_64
-        yum -y install lustre-osd-ldiskfs-mount-2.9.0-1.el7.x86_64
+        yum -y install kernel-3.10.0-957.el7_lustre.x86_64
+        yum -y install lustre
+        yum -y install kmod-lustre
+        yum -y install kmod-lustre-osd-ldiskfs
+        yum -y install lustre-osd-ldiskfs-mount
         yum -y install e2fsprogs
-        yum -y install lustre-tests-2.9.0-1.el7.x86_64
+        yum -y install lustre-tests
 
         echo "options lnet networks=tcp"> /etc/modprobe.d/lnet.conf
         chkconfig lnet --add
