@@ -64,7 +64,7 @@ scan_for_new_disks() {
 get_disk_count() {
     DISKCOUNT=0
     for DISK in "${DISKS[@]}";
-    do 
+    do
         DISKCOUNT+=1
     done;
     echo "$DISKCOUNT"
@@ -73,7 +73,7 @@ get_disk_count() {
 
 #End -RAID0
 
-#Install azure cli and jq 
+#Install azure cli and jq
 #
 install_basetools()
 {
@@ -104,13 +104,13 @@ setup_raid()
 
 	#Verify attached data disks
 	ls -l /dev | grep sd
-	
+
 	DISKS=($(scan_for_new_disks))
     echo "Disks are ${DISKS[@]}"
     declare -i DISKCOUNT
-    DISKCOUNT=$(get_disk_count) 
+    DISKCOUNT=$(get_disk_count)
     echo "Disk count is $DISKCOUNT"
-	
+
 	#Create RAID md device
 	mdadm -C /dev/md0 -l raid0 -n "$DISKCOUNT" "${DISKS[@]}"
 }
@@ -122,18 +122,18 @@ setup_user()
 	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
-   
+
     groupadd -g $HPC_GID $HPC_GROUP
 
     # Don't require password for HPC user sudo
     echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-    
+
     # Disable tty requirement for sudo
     sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
 
 	useradd -c "HPC User" -g $HPC_GROUP -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
 
-    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
+    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
 }
 
 install_lustre_repo()
@@ -153,7 +153,7 @@ install_lustre()
      yum -y install e2fsprogs
      yum -y install lustre-tests
 
-     echo “options lnet networks=tcp”> /etc/modprobe.d/lnet.conf
+     echo "options lnet networks=tcp" /etc/modprobe.d/lnet.conf
      chkconfig lnet --add
      chkconfig lnet on
      chkconfig lustre --add
@@ -209,7 +209,7 @@ fi
 sudo mkfs.lustre --fsname=LustreFS --backfstype=ldiskfs --reformat --ost --mgsnode=$MGMT_HOSTNAME --index=$INDEX /dev/md0
 mkdir /mnt/oss
 sudo mount -t lustre /dev/md0 /mnt/oss
-echo "/dev/md0 /mnt/oss lustre noatime,nodiratime,nobarrier,nofail 0 2" >> /etc/fstab
+echo "/dev/md0 /mnt/oss lustre noatime,nodiratime,nobarrier 0 2" >> /etc/fstab
 touch /root/lustre.setup
 EOF
 	chmod 700 /root/installlustre.sh

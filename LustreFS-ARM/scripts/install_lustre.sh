@@ -44,7 +44,7 @@ is_management()
 
 is_metadatanode()
 {
-	if [ "$NODE_TYPE" == "meta" ]; then 
+	if [ "$NODE_TYPE" == "meta" ]; then
 		return 0
 	fi
 	return 1
@@ -84,16 +84,16 @@ w
 EOF
         createdPartitions="$createdPartitions /dev/${disk}1"
     done
-    
+
     sleep 10
 
     # Create RAID-0 volume
     #if [ -n "$createdPartitions" ]; then
      #   devices=`echo $createdPartitions | wc -w`
         #mdadm --create /dev/$raidDevice --level 0 --raid-devices $devices $createdPartitions
-        
+
       #  sleep 10
-        
+
         #mdadm /dev/$raidDevice
 
         #if [ "$filesystem" == "xfs" ]; then
@@ -105,9 +105,9 @@ EOF
             #tune2fs -o user_xattr /dev/$raidDevice
             #echo "/dev/$raidDevice $mountPoint $filesystem noatime,nodiratime,nobarrier,nofail 0 2" >> /etc/fstab
         #fi
-        
+
         #sleep 10
-        
+
         #mount /dev/$raidDevice
     #fi
 }
@@ -120,10 +120,10 @@ mv LustrePack.repo /etc/yum.repos.d/LustrePack.repo
 }
 
 install_lustre()
-{     
+{
 	# setup metata data
     if is_metadatanode; then
-		
+
         yum -y install kernel-3.10.0-957.el7_lustre.x86_64
         yum -y install lustre
         yum -y install kmod-lustre
@@ -132,7 +132,19 @@ install_lustre()
         yum -y install e2fsprogs
         yum -y install lustre-tests
 
-        echo "options lnet networks=tcp"> /etc/modprobe.d/lnet.conf
+        cat <<EOF>/etc/lnet.conf
+net:
+    - net type: tcp
+      local NI(s):
+        - nid: $(hostname -I | sed 's/ //g')@tcp0
+          interfaces:
+              0: eth0
+          tunables:
+              peer_timeout: 180
+              peer_credits: 128
+              peer_buffer_credits: 0
+              credits: 1024
+EOF
         chkconfig lnet --add
         chkconfig lnet on
         chkconfig lustre --add
@@ -148,18 +160,18 @@ setup_user()
 	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/exports
 	mount -a
 	mount
-   
+
     groupadd -g $HPC_GID $HPC_GROUP
 
     # Don't require password for HPC user sudo
     echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-    
+
     # Disable tty requirement for sudo
     sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
 
 	useradd -c "HPC User" -g $HPC_GROUP -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
 
-    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
+    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
 
 }
 

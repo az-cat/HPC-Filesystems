@@ -50,15 +50,15 @@ setup_user()
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
-	echo "$JUMPBOX_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
-   
+
     groupadd -g $HPC_GID $HPC_GROUP
 
     # Don't require password for HPC user sudo
     echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-    
+
     # Disable tty requirement for sudo
     sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
 
@@ -66,7 +66,7 @@ setup_user()
 
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
 
-	
+
 }
 
 install_lustre_repo()
@@ -132,18 +132,18 @@ sudo chown -R $HPC_USER: /mnt
 sudo chmod +777 $LUSTRE_CLIENT
 
  # Group for admin with r+w+e permission
-	sudo groupadd $ADMIN_GROUP	
+	sudo groupadd $ADMIN_GROUP
 	sudo chgrp -R $ADMIN_GROUP /mnt/lustre
 	sudo chmod -R 770 /mnt/lustre
 
 	 # Group for reader with r+e permission
 
-	sudo groupadd $READER_GROUP	
+	sudo groupadd $READER_GROUP
 	sudo chgrp -R $READER_GROUP /mnt/lustre
 	sudo chmod -R 750 /mnt/lustre
 
 	# Group for write with w+e permission
-	sudo groupadd $WRITER_GROUP	
+	sudo groupadd $WRITER_GROUP
 	sudo chgrp -R $WRITER_GROUP /mnt/lustre
 	sudo chmod -R 730 /mnt/lustre
 EOF
@@ -152,7 +152,7 @@ EOF
 	echo "@reboot /root/installlustre.sh >>/root/log.txt" >> lustrecron
 	crontab lustrecron
 	rm lustrecron
-		
+
 }
 
 SETUP_MARKER=/var/local/install_lustre.marker
