@@ -153,7 +153,19 @@ install_lustre()
      yum -y install e2fsprogs
      yum -y install lustre-tests
 
-     echo "options lnet networks=tcp" /etc/modprobe.d/lnet.conf
+     cat <<EOF>/etc/lnet.conf
+net:
+    - net type: tcp
+      local NI(s):
+        - nid: $(hostname -I | sed 's/ //g')@tcp0
+          interfaces:
+              0: eth0
+          tunables:
+              peer_timeout: 180
+              peer_credits: 128
+              peer_buffer_credits: 0
+              credits: 1024
+EOF
      chkconfig lnet --add
      chkconfig lnet on
      chkconfig lustre --add
